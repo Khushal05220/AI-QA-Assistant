@@ -1,0 +1,5 @@
+{
+  "name": "AI QA Assistant",
+  "description": "An assistant for Quality Assurance tasks, leveraging AI to generate test cases, test scripts, and perform ADA compliance audits. This tool prioritizes Chrome's built-in AI for fast, local processing, with a fallback to server-side Gemini APIs.",
+  "requestFramePermissions": []
+}
