@@ -5,15 +5,31 @@ import AdaAuditor from './AdaAuditor';
 
 // --- ENUMS & TYPES ---
 enum Page {
-  Home,
-  TestCases,
-  TestScripts,
-  AdaAuditor,
+  Home = 'home',
+  TestCases = 'test-cases',
+  TestScripts = 'test-scripts',
+  AdaAuditor = 'ada-auditor',
 }
 
 interface PageProps {
   setCurrentPage: (page: Page) => void;
 }
+
+// --- CONFIGURATION ---
+const pageToPath: { [key in Page]: string } = {
+  [Page.Home]: '/',
+  [Page.TestCases]: '/test-cases',
+  [Page.TestScripts]: '/test-scripts',
+  [Page.AdaAuditor]: '/ada-auditor',
+};
+
+const pathToPage: { [key: string]: Page } = {
+  '/': Page.Home,
+  '/test-cases': Page.TestCases,
+  '/test-scripts': Page.TestScripts,
+  '/ada-auditor': Page.AdaAuditor,
+};
+
 
 // --- SVG ICONS ---
 const TestCasesIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -34,7 +50,6 @@ const AdaAuditorIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-// --- CONFIGURATION ---
 const navItems = [
     { page: Page.TestCases, text: 'AI Test Case Generator', icon: TestCasesIcon, description: "Automatically generate comprehensive, context-aware test cases from user stories, requirements, or design mockups." },
     { page: Page.TestScripts, text: 'AI Test Script Generator', icon: TestScriptsIcon, description: "Convert plain language test steps into executable automation scripts for popular frameworks like Cypress or Playwright." },
@@ -188,7 +203,8 @@ const HomePage: React.FC<PageProps> = ({ setCurrentPage }) => {
                 })}
             </main>
              <footer className="text-center py-12">
-                <p className="text-gray-500">More tools coming soon...</p>
+                <h4 className="text-lg font-semibold text-gray-400 mb-2">More Tools Coming Soon...</h4>
+                <p className="text-gray-500">Performance/Load Tester • API Testing • Test Plan Maker</p>
             </footer>
         </>
     );
@@ -196,17 +212,38 @@ const HomePage: React.FC<PageProps> = ({ setCurrentPage }) => {
 
 // --- MAIN APP ---
 const App: React.FC = () => {
-    const [currentPage, setCurrentPage] = useState<Page>(Page.Home);
+    const [currentPage, setCurrentPage] = useState<Page>(() => {
+        const path = window.location.hash.slice(1) || '/';
+        return pathToPage[path] ?? Page.Home;
+    });
     const [isAnimating, setIsAnimating] = useState(false);
+    
+    // Listen for browser back/forward navigation
+    useEffect(() => {
+        const handleHashChange = () => {
+            const path = window.location.hash.slice(1) || '/';
+            const newPage = pathToPage[path] ?? Page.Home;
+            if (newPage !== currentPage) {
+                setIsAnimating(true);
+                setTimeout(() => {
+                    setCurrentPage(newPage);
+                    setIsAnimating(false);
+                }, 150);
+            }
+        };
 
-    const handleNavigation = useCallback((page: Page) => {
-        if (page === currentPage) return;
-        setIsAnimating(true);
-        setTimeout(() => {
-            setCurrentPage(page);
-            setIsAnimating(false);
-        }, 150); // Corresponds to the fade-out duration
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
     }, [currentPage]);
+
+    // Handle navigation from clicks within the app
+    const handleNavigation = useCallback((page: Page) => {
+        const newPath = pageToPath[page];
+        const currentPath = window.location.hash.slice(1) || '/';
+        if (newPath !== currentPath) {
+            window.location.hash = newPath;
+        }
+    }, []);
 
     const renderPage = () => {
         switch (currentPage) {
