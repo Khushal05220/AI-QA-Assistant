@@ -1,4 +1,4 @@
-🧠 AI QA Assistant
+🧠 AI QA Assistant  - https://ai-qa-assistant-835925884833.us-west1.run.app/
 <img width="1110" height="617" alt="image" src="https://github.com/user-attachments/assets/63abcb1e-d32b-4fc7-b75c-7a72426a7396" />
 
 AI-Powered Test Case Generator | Script Builder | Accessibility Auditor
